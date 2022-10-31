@@ -1,6 +1,6 @@
 import { onMessage, sendMessage } from 'webext-bridge'
 import type { Tabs } from 'webextension-polyfill'
-import { browserAction, commands } from "webextension-polyfill";
+import { browserAction, commands } from 'webextension-polyfill'
 
 // only on dev mode
 if (import.meta.hot) {
@@ -65,8 +65,15 @@ commands.onCommand.addListener(async (command) => {
   console.log('Command:', command)
   if (command === 'Open Note Prompt') {
     browserAction.openPopup()
-  } else if (command === 'Test Highlight') {
-    let tabId = (await browser.tabs.query({active: true, currentWindow: true}))[0].id!
-    sendMessage('test-highlight', { title: 'abc' }, { context: 'content-script', tabId })
+  }
+  else if (command === 'Test Highlight') {
+    const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
+    sendMessage('highlight-input', { tabId }, { context: 'content-script', tabId })
   }
 })
+
+// onMessage('highlight-to-textbox', async ({ data }) => {
+//   const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
+//   sendMessage('highlight-to-textbox-popup', { text: data.text }, { context: 'popup', tabId })
+// })
+

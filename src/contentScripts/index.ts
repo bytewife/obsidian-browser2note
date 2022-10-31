@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { onMessage } from 'webext-bridge'
+import { onMessage, sendMessage } from 'webext-bridge'
 import { createApp } from 'vue'
 import App from './views/App.vue'
 
@@ -13,10 +13,11 @@ import App from './views/App.vue'
     console.info(`[vitesse-webext] Navigate from page "${data.title}"`)
   })
 
-  onMessage('test-highlight', ({ data }) => {
-    console.info('hi')
-    console.log('info')
-    console.info(window.getSelection())
+  onMessage('highlight-input', async ({ data }) => {
+    console.log('caught highlight-input')
+    const tabId = data.tabId
+    const highlightText = window.getSelection() ? window.getSelection()!.toString() : ''
+    sendMessage('highlight-to-textbox', { text: highlightText }, { context: 'popup', tabId })
   })
 
   // mount component to context window
