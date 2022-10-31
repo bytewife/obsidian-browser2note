@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import replace from '@rollup/plugin-replace'
 import { sharedConfig } from './vite.config'
 import { isDev, r } from './scripts/utils'
 import packageJson from './package.json'
@@ -26,5 +27,12 @@ export default defineConfig({
       },
     },
   },
-  plugins: sharedConfig.plugins,
+  plugins: [
+    ...sharedConfig.plugins || [],
+    replace({
+      values: {
+        'process.env.NODE_ENV': `"${process.env.NODE_ENV || 'production'}"`,
+      },
+    }),
+  ],
 })

@@ -35,6 +35,7 @@ export async function getManifest() {
       'tabs',
       'storage',
       'activeTab',
+      'scripting',
       'http://*/',
       'https://*/',
     ],
@@ -45,6 +46,18 @@ export async function getManifest() {
     web_accessible_resources: [
       'dist/contentScripts/style.css',
     ],
+    commands: {
+      'Open Note Prompt': {
+        suggested_key: {
+          default: 'Ctrl+Shift+U',
+        },
+      },
+      'Test Highlight': {
+        suggested_key: {
+          default: 'Ctrl+E',
+        },
+      },
+    },
   }
 
   if (isDev) {

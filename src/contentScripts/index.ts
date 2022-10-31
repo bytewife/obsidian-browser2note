@@ -10,6 +10,13 @@ import App from './views/App.vue'
   // communication example: send previous tab title from background page
   onMessage('tab-prev', ({ data }) => {
     console.log(`[vitesse-webext] Navigate from page "${data.title}"`)
+    console.info(`[vitesse-webext] Navigate from page "${data.title}"`)
+  })
+
+  onMessage('test-highlight', ({ data }) => {
+    console.info('hi')
+    console.log('info')
+    console.info(window.getSelection())
   })
 
   // mount component to context window

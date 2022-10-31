@@ -1,5 +1,6 @@
 import { onMessage, sendMessage } from 'webext-bridge'
 import type { Tabs } from 'webextension-polyfill'
+import { browserAction, commands } from "webextension-polyfill";
 
 // only on dev mode
 if (import.meta.hot) {
@@ -50,5 +51,22 @@ onMessage('get-current-tab', async () => {
     return {
       title: undefined,
     }
+  }
+})
+
+// Handle shortcuts.
+commands.onCommand.addListener(async (command) => {
+  // console.log(browser.tabs.executeScript(tabId, {file: '../../dist/contentScripts/index.global.js'}).then(
+  //   (res) => {
+  //     console.log(res)
+  //   }
+  // ))
+  // eslint-disable-next-line no-console
+  console.log('Command:', command)
+  if (command === 'Open Note Prompt') {
+    browserAction.openPopup()
+  } else if (command === 'Test Highlight') {
+    let tabId = (await browser.tabs.query({active: true, currentWindow: true}))[0].id!
+    sendMessage('test-highlight', { title: 'abc' }, { context: 'content-script', tabId })
   }
 })
