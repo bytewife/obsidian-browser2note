@@ -36,6 +36,11 @@ export async function readFromFile(filename: string) {
     { method: 'get' },
     true,
   )
+    .then((res, err) => {
+      if (err)
+        console.error(`Error opening file: ${filename}. Check if it was removed.`, err)
+      return res
+    })
 }
 
 export async function writeFile(filename: string, text: string) {
@@ -45,4 +50,9 @@ export async function writeFile(filename: string, text: string) {
       { method: 'put', body: text },
       true,
   )
+    .then((res, err) => {
+      if (err)
+        console.error(`Error opening file: ${filename}. Check if it was removed.`, err)
+      return res
+    })
 }

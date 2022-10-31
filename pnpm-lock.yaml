@@ -34,6 +34,7 @@ specifiers:
   vitest: ^0.24.0
   vue: ^3.2.40
   vue-demi: ^0.13.11
+  vue-multiselect: 3.0.0-alpha.2
   web-ext: ^7.2.0
   webext-bridge: ^5.0.5
   webextension-polyfill: ^0.10.0
@@ -41,6 +42,7 @@ specifiers:
 dependencies:
   '@rollup/plugin-replace': 5.0.1
   portal-vue: 3.0.0-beta.0_vue@3.2.40
+  vue-multiselect: 3.0.0-alpha.2
 
 devDependencies:
   '@antfu/eslint-config': 0.27.0_z4bbprzjrhnsfa24uvmcbu7f5q
@@ -6519,6 +6521,11 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /vue-multiselect/3.0.0-alpha.2:
+    resolution: {integrity: sha512-Xp9fGJECns45v+v8jXbCIsAkCybYkEg0lNwr7Z6HDUSMyx2TEIK2giipPE+qXiShEc1Ipn+ZtttH2iq9hwXP4Q==}
+    engines: {node: '>= 4.0.0', npm: '>= 3.0.0'}
+    dev: false
 
   /vue/3.2.40:
     resolution: {integrity: sha512-1mGHulzUbl2Nk3pfvI5aXYYyJUs1nm4kyvuz38u4xlQkLUn1i2R7nDbI4TufECmY8v1qNBHYy62bCaM+3cHP2A==}

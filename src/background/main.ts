@@ -1,6 +1,7 @@
 import { onMessage, sendMessage } from 'webext-bridge'
 import type { Tabs } from 'webextension-polyfill'
 import { browserAction, commands } from 'webextension-polyfill'
+import { selectedFileCached, selectedLineNumberCached } from "~/logic";
 
 // only on dev mode
 if (import.meta.hot) {
@@ -76,4 +77,22 @@ commands.onCommand.addListener(async (command) => {
 //   const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
 //   sendMessage('highlight-to-textbox-popup', { text: data.text }, { context: 'popup', tabId })
 // })
+
+// Cache selected file settings from previous popup.
+let selectedFileTemp = ''
+let selectedLineNumberTemp = -1
+onMessage('sync-previous-filename', async ({ data }) => {
+  selectedFileTemp = data.filename
+})
+
+onMessage('sync-previous-line-number', async ({ data }) => {
+  selectedLineNumberTemp = data.lineNumber
+})
+
+browser.runtime.onConnect.addListener((externalPort) => {
+  externalPort.onDisconnect.addListener(() => {
+    selectedFileCached.value = selectedFileTemp
+    selectedLineNumberCached.value = selectedLineNumberTemp
+  })
+})
 
