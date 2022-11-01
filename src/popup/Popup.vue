@@ -67,7 +67,7 @@ commands.onCommand.addListener(async (command) => {
       const newLineNumber = Math.max(
         NULL_LINENUMBER,
         textboxLineNumber.value - 1)
-      textboxLineNumber.value = newLineNumber
+      moveTextbox(newLineNumber)
       break
     }
     case 'Move Textbox Down': {
@@ -75,7 +75,7 @@ commands.onCommand.addListener(async (command) => {
       const newLineNumber = Math.min(
         existingNoteLines.value.length - 1,
         textboxLineNumber.value + 1)
-      textboxLineNumber.value = newLineNumber
+      moveTextbox(newLineNumber)
       break
     }
   }

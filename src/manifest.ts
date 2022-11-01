@@ -48,28 +48,28 @@ export async function getManifest() {
     commands: {
       'Open Note Prompt': {
         suggested_key: {
-          default: 'Alt+Shift+U',
+          default: 'Ctrl+Shift+U',
           mac: 'Command+Shift+U',
         },
-        description: 'Open the note prompt',
+        description: 'Open the note prompt (use "Activate the extension" in Chrome)',
       },
       'Indent New Text': {
         suggested_key: {
-          default: 'Alt+Shift+O',
+          default: 'Ctrl+Shift+O',
           mac: 'Command+Shift+O',
         },
         description: 'Indent textbox',
       },
       'Unindent New Text': {
         suggested_key: {
-          default: 'Alt+Shift+I',
+          default: 'Ctrl+Shift+I',
           mac: 'Command+Shift+I',
         },
         description: 'Unindent textbox',
       },
       'Submit Prompt': {
         suggested_key: {
-          default: 'Alt+Shift+P',
+          default: 'Ctrl+Shift+P',
           mac: 'Command+Shift+P',
         },
         description: 'Submit changes to file',
