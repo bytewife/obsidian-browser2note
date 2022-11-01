@@ -48,33 +48,37 @@ export async function getManifest() {
     commands: {
       'Open Note Prompt': {
         suggested_key: {
-          default: 'Ctrl+Alt+U',
+          default: 'Alt+Shift+U',
+          mac: 'Command+Shift+U',
         },
+        description: 'Open the note prompt',
       },
       'Indent New Text': {
         suggested_key: {
-          default: 'Ctrl+Alt+O',
+          default: 'Alt+Shift+O',
+          mac: 'Command+Shift+O',
         },
+        description: 'Indent textbox',
       },
       'Unindent New Text': {
         suggested_key: {
-          default: 'Ctrl+Alt+I',
+          default: 'Alt+Shift+I',
+          mac: 'Command+Shift+I',
         },
+        description: 'Unindent textbox',
       },
       'Submit Prompt': {
         suggested_key: {
-          default: 'Ctrl+Alt+P',
+          default: 'Alt+Shift+P',
+          mac: 'Command+Shift+P',
         },
+        description: 'Submit changes to file',
       },
       'Move Textbox Up': {
-        suggested_key: {
-          default: 'Ctrl+Alt+Up',
-        },
+        description: 'Move textbox up',
       },
       'Move Textbox Down': {
-        suggested_key: {
-          default: 'Ctrl+Alt+Down',
-        },
+        description: 'Move textbox down',
       },
       'Extra Information (does nothing)': {
         description: 'You may find it useful to use Tab & Shift-Tab to switch between the file picker and the textbox!',

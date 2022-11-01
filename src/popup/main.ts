@@ -6,6 +6,5 @@ import '../styles'
 
 const app = createApp(App)
 app.use(PortalVue)
-app.use(ResizeTextarea)
 app.component(VueMultiselect)
 app.mount('#app')
