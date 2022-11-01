@@ -131,14 +131,7 @@ function getMarkdownLink(url: string) {
 // Updates the line number of the textbox, s.t. it may move via Vue or some other reactive framework.
 function moveTextbox(index: number) {
   textboxLineNumber.value = index
-  let newHeader = getExistingNoteLineByNumber(index)
-  // Match textbox bullet point.
-  while (newHeader.startsWith('\t'))
-    newHeader = newHeader.slice(1)
-  if (newHeader.startsWith('- ') && !textboxContent.value.startsWith('- '))
-    textboxContent.value = `- ${textboxContent.value}`
-  else if (!newHeader.startsWith('- ') && textboxContent.value.startsWith('- '))
-    textboxContent.value = textboxContent.value.slice(2)
+  updateTextboxContentBullet()
 }
 
 // Get browser's highlighted text information.
@@ -152,6 +145,7 @@ async function updateHighlight() {
     }
     textHighlightUrl.value = data.url!
     textboxContent.value = data.text
+    updateTextboxContentBullet(data.text)
   })
   const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
   sendMessage('highlight-input', { tabId }, { context: 'content-script', tabId })
@@ -178,6 +172,20 @@ async function updateTextboxLineNumberCached(isWriting: boolean) {
   const lineNumber = textboxLineNumber.value + (isWriting ? 1 : 0)
   const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
   await sendMessage('sync-previous-line-number', { lineNumber }, { context: 'background', tabId })
+}
+
+function updateTextboxContentBullet(text?: string) {
+  if (!text)
+    text = textboxContent.value
+  const index = textboxLineNumber.value
+  let newHeader = getExistingNoteLineByNumber(index)
+  // Match textbox bullet point.
+  while (newHeader.startsWith('\t'))
+    newHeader = newHeader.slice(1)
+  if (newHeader.startsWith('- ') && !textboxContent.value.startsWith('- '))
+    textboxContent.value = `- ${textboxContent.value}`
+  else if (!newHeader.startsWith('- ') && textboxContent.value.startsWith('- '))
+    textboxContent.value = textboxContent.value.slice(2)
 }
 
 // This function updates the textbox's height to fit its text content fully.
@@ -259,7 +267,7 @@ updateHighlight()
 
       <!-- Existing note lines -->
       <div v-for="(noteLine, index) in existingNoteLines" :key="index" class="noteLine" @click="moveTextbox(index)">
-        <pre>{{ simplifyNoteLine(noteLine) }}</pre>
+        <pre>{{ noteLine }}</pre>
 
         <!-- Textbox portal -->
         <div v-if="textboxLineNumber === index">
