@@ -5,20 +5,21 @@ import ohm from 'ohm-js'
 // I recommend testing in https://ohmjs.org/editor/
 const linksGrammar = `
 Links {
-  Start = recurse
-  recurse = (mainLink | mainBacklink | text)*
-  mainLink = (~link text)* spaces link spaces recurse
-  mainBacklink =  (~backlink text)* spaces backlink spaces recurse
-  text = any
-  link = "[" (~"]" text)* "]" "(" (~")" text)* ")"
-  backlink = "[[" (~"]]" text)* "]]"
+	start = recurse
+    recurse = (mainLink | mainBacklink | text)*
+    mainLink = (~link text)* xspaces link xspaces recurse
+    mainBacklink = (~backlink text)* xspaces backlink xspaces recurse
+   	text = any
+    link = "[" (~"]" text)* "]" "(" (~")" text)* ")"
+    backlink = "[[" (~"]]" text)* "]]"
+    xspaces = (" " | "\\r\\n" | "\\n")*
 }
 `
 
 export const grammar = ohm.grammar(linksGrammar)
 export const hideLinkSemantics = grammar.createSemantics()
 hideLinkSemantics.addOperation('eval()', {
-  Start(recurse) {
+  start(recurse) {
     const result = recurse.eval()
     return result
   },

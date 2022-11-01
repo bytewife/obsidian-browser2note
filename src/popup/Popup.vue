@@ -267,7 +267,7 @@ updateHighlight()
 
       <!-- Existing note lines -->
       <div v-for="(noteLine, index) in existingNoteLines" :key="index" class="noteLine" @click="moveTextbox(index)">
-        <pre>{{ noteLine }}</pre>
+        <pre>{{ simplifyNoteLine(noteLine) }}</pre>
 
         <!-- Textbox portal -->
         <div v-if="textboxLineNumber === index">
