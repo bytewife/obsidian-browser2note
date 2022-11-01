@@ -11,11 +11,6 @@ if (import.meta.hot) {
   import('./contentScriptHMR')
 }
 
-browser.runtime.onInstalled.addListener((): void => {
-  // eslint-disable-next-line no-console
-  console.log('Extension installed')
-})
-
 // Handle shortcuts.
 commands.onCommand.addListener(async (command) => {
   console.log('Command:', command)
@@ -38,11 +33,11 @@ let selectedLineNumberTemp = -1
 onMessage('sync-previous-filename', async ({ data }) => {
   selectedFileTemp = data.filename
 })
-
 onMessage('sync-previous-line-number', async ({ data }) => {
   selectedLineNumberTemp = data.lineNumber
 })
 
+// Finalize variables into cache after popup closes.
 browser.runtime.onConnect.addListener((externalPort) => {
   externalPort.onDisconnect.addListener(() => {
     selectedFileCached.value = selectedFileTemp

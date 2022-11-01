@@ -7,7 +7,6 @@ export async function getManifest() {
   const pkg = await fs.readJSON(r('package.json')) as typeof PkgType
 
   // update this file to update this manifest.json
-  // can also be conditional based on your need
   const manifest: Manifest.WebExtensionManifest = {
     manifest_version: 2,
     name: pkg.displayName || pkg.name,
@@ -49,12 +48,7 @@ export async function getManifest() {
     commands: {
       'Open Note Prompt': {
         suggested_key: {
-          default: 'Ctrl+Shift+U',
-        },
-      },
-      'Test Highlight': {
-        suggested_key: {
-          default: 'Ctrl+E',
+          default: 'Ctrl+Alt+U',
         },
       },
       'Indent New Text': {
@@ -66,6 +60,24 @@ export async function getManifest() {
         suggested_key: {
           default: 'Ctrl+Alt+I',
         },
+      },
+      'Submit Prompt': {
+        suggested_key: {
+          default: 'Ctrl+Alt+P',
+        },
+      },
+      'Move Textbox Up': {
+        suggested_key: {
+          default: 'Ctrl+Alt+Up',
+        },
+      },
+      'Move Textbox Down': {
+        suggested_key: {
+          default: 'Ctrl+Alt+Down',
+        },
+      },
+      'Extra Information (does nothing)': {
+        description: 'You may find it useful to use Tab & Shift-Tab to switch between the file picker and the textbox!',
       },
     },
   }

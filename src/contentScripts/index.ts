@@ -7,6 +7,8 @@ import { browserAction } from "webextension-polyfill";
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
 
 (() => {
+  // Converts a browser window selection into a 'go to highlight`-style link.
+  // Note: as of writing this, those links are not natively supported on Firefox.
   function getLinkToSelected(selection): string | null {
     const result = generateFragment(selection)
     const url = `${location.origin}${location.pathname}${location.search}`
@@ -30,13 +32,12 @@ import { browserAction } from "webextension-polyfill";
     }
   }
 
-  console.info('[vitesse-webext] Hello world from content script')
+  console.info('[obsidian-browser2note] Hello world from content script')
 
+  // Grabs the highlight from the browser content and sends it to the popup.
   onMessage('highlight-input', async ({ data }) => {
-    console.log('caught highlight-input')
     const tabId = data.tabId
     const highlightText = window.getSelection() ? window.getSelection()!.toString() : ''
-    // Note: This doesn't work in Firefox.
     const url = getLinkToSelected(window.getSelection())
     sendMessage('highlight-to-textbox', { text: highlightText, url }, { context: 'popup', tabId })
   })

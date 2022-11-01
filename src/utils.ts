@@ -1,5 +1,8 @@
 import { apiKey } from '~/logic'
 
+// This file contains various web utils, which interact with the Obsidian local REST API plugin.
+
+// Borrowed from `coddingtonbear/obsidian-web`.
 export async function obsidianRequest(
   apiKey: string,
   path: string,
@@ -30,7 +33,6 @@ export async function readDirectory() {
 
 export async function readFromFile(filename: string) {
   // TODO: Get secure mode working.
-    console.log('filename ',filename)
   return obsidianRequest(
     apiKey.value,
     `/vault/${filename}`,
