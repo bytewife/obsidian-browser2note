@@ -14,7 +14,10 @@ It is intended for an outline-heavy workflow.
 - Automatically adds/removes bullet points based on context
 - Visually hides Markdown links from the user while viewing an existing note
 
+## What it looks like
+---
 ![Image of extension usage](example.jpg)
+---
 
 ## Prerequisites
 - Requires the [obsidian-local-rest-api](https://github.com/coddingtonbear/obsidian-local-rest-api) plugin
