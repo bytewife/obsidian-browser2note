@@ -16,45 +16,6 @@ browser.runtime.onInstalled.addListener((): void => {
   console.log('Extension installed')
 })
 
-let previousTabId = 0
-
-// communication example: send previous tab title from background page
-// see shim.d.ts for type declaration
-browser.tabs.onActivated.addListener(async ({ tabId }) => {
-  if (!previousTabId) {
-    previousTabId = tabId
-    return
-  }
-
-  let tab: Tabs.Tab
-
-  try {
-    tab = await browser.tabs.get(previousTabId)
-    previousTabId = tabId
-  }
-  catch {
-    return
-  }
-
-  // eslint-disable-next-line no-console
-  console.log('previous tab', tab)
-  sendMessage('tab-prev', { title: tab.title }, { context: 'content-script', tabId })
-})
-
-onMessage('get-current-tab', async () => {
-  try {
-    const tab = await browser.tabs.get(previousTabId)
-    return {
-      title: tab?.title,
-    }
-  }
-  catch {
-    return {
-      title: undefined,
-    }
-  }
-})
-
 // Handle shortcuts.
 commands.onCommand.addListener(async (command) => {
   // console.log(browser.tabs.executeScript(tabId, {file: '../../dist/contentScripts/index.global.js'}).then(
@@ -72,11 +33,6 @@ commands.onCommand.addListener(async (command) => {
     sendMessage('highlight-input', { tabId }, { context: 'content-script', tabId })
   }
 })
-
-// onMessage('highlight-to-textbox', async ({ data }) => {
-//   const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
-//   sendMessage('highlight-to-textbox-popup', { text: data.text }, { context: 'popup', tabId })
-// })
 
 // Cache selected file settings from previous popup.
 let selectedFileTemp = ''

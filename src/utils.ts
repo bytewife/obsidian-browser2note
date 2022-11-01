@@ -30,6 +30,7 @@ export async function readDirectory() {
 
 export async function readFromFile(filename: string) {
   // TODO: Get secure mode working.
+    console.log('filename ',filename)
   return obsidianRequest(
     apiKey.value,
     `/vault/${filename}`,

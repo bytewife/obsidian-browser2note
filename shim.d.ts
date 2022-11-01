@@ -8,7 +8,7 @@ declare module 'webext-bridge' {
     'sync-previous-line-number': { lineNumber: number }
     'highlight-input': { tabId: number }
     'tab-prev': { title: string | undefined }
-    'highlight-to-textbox': { text: string }
+    'highlight-to-textbox': { text: string, url: string | null }
     'get-current-tab': ProtocolWithReturn<{ tabId: number }, { title?: string }>
   }
 }
