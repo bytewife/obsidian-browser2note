@@ -141,6 +141,14 @@ async function handleFileSelectorSelect(filename: string) {
 }
 
 async function handleTextboxMove() {
+  const newHeader = getExistingNoteLine(textboxLineNumber.value)
+  // Match textbox bullet point.
+  if (newHeader.startsWith('- ') && !textboxContent.value.startsWith('- ')) {
+    textboxContent.value = `- ${textboxContent.value}`
+  }
+  else if (!newHeader.startsWith('- ') && textboxContent.value.startsWith('- ')) {
+    textboxContent.value = textboxContent.value.slice(2)
+  }
   await updateTextboxLineNumberCached(false)
 }
 
