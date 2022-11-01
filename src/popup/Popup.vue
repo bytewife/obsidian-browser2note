@@ -221,7 +221,14 @@ async function loadExistingNoteLines(filename: string) {
 async function loadFileSelectorOptions() {
   // TODO cache this by doing every time the plugin loads, or by clicking refresh
   readDirectory()
-    .then(res => res.json())
+    .then(res => {
+      if (res.status !== 200) {
+        console.error('Error: Could not read directory.')
+        window.alert('Error: Could not read directory.')
+        return
+      }
+      return res.json()
+    })
     .then((res) => {
       fileSelectorOptions.value = res.files
     })
