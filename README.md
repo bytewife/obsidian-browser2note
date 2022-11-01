@@ -1,5 +1,5 @@
 # Obsidian Browser2Note
-> WARNING: This browser is in heavy development.
+> WARNING: This project is in heavy development.
 
 Send editable highlighted text (and their URL) to ObsidianMD notes, quickly & flexibly!
 
