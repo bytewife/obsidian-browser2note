@@ -5,6 +5,30 @@ import { browserAction, commands } from 'webextension-polyfill'
 import { allFilenamesCached, apiKey, selectedFileCached, selectedLineNumberCached } from '~/logic/storage'
 import { obsidianRequest, readDirectory, readFromFile, writeFile } from '~/utils'
 import { NULL_FILENAME, NULL_LINENUMBER } from '~/constants'
+import ohm from "ohm-js"; ohm
+
+const linksGrammar = `
+Links {
+	Start = Recurse
+    Recurse = (MainLink | MainBacklink | text)*
+    MainLink = (~exclude text)* link Recurse
+    MainBacklink =  (~exclude text)* backlink Recurse
+    exclude = space | link | backlink
+   	text = ~exclude any
+    link = "[" (~"]" text)* "]" "(" (~")" text)* ")"
+    backlink = "[[" (~"]]" text)* "]]"
+}
+`
+
+function parse(text: string) {
+  const grammar = ohm.grammar(linksGrammar)
+  const match = grammar.match(text)
+  if (match.succeeded()) {
+    console.log('match succeeded')
+  } else {
+    console.log('match failed')
+  }
+}
 
 const NULL_URL = ''
 const TOPMOST_LINE_CONTENT = ' '
@@ -16,7 +40,7 @@ const textboxContent = ref('')
 const textboxLineNumber = ref<number>(selectedLineNumberCached.value)
 const fileSelectorSelectedFile = ref(selectedFileCached.value)
 if (selectedFileCached.value !== NULL_FILENAME) {
-  updateExistingNoteLines(selectedFileCached.value)
+  loadExistingNoteLines(selectedFileCached.value)
 }
 const textHighlightUrl = ref(NULL_URL)
 const fileSelectorOptions = ref(allFilenamesCached.value)
@@ -42,8 +66,8 @@ commands.onCommand.addListener(async (command) => {
       const currentExistingNoteLineTabCount = convertNoteLineToTabCount(getExistingNoteLine(textboxLineNumber.value), false)
       let newIndentBalance = indentBalance.value - 1
       // Don't allow the user to unindent past the existing note line.
-      if (indentBalance.value < currentExistingNoteLineTabCount) {
-        newIndentBalance = currentExistingNoteLineTabCount
+      if (currentExistingNoteLineTabCount + indentBalance.value < 0) {
+        newIndentBalance = -currentExistingNoteLineTabCount
       }
       indentBalance.value = newIndentBalance
       break
@@ -93,12 +117,15 @@ function getMarkdownLink(url: string) {
   return `[1](${url})`
 }
 
-async function updateExistingNoteLines(filename: string) {
+async function loadExistingNoteLines(filename: string) {
   readFromFile(filename).then(res => res.text()).then((text) => {
     const textLines = text.split('\n')
     console.log('text lines are ', textLines)
     existingNoteLines.value = textLines
     isFileRead.value = true
+    // textLines.forEach((line) => {
+    //   parse(line)
+    // })
   })
 }
 
@@ -121,7 +148,7 @@ async function updateHighlight() {
   sendMessage('highlight-input', { tabId }, { context: 'content-script', tabId })
 }
 
-async function loadFileSelector() {
+async function loadFileSelectorOptions() {
   // TODO cache this by doing every time the plugin loads, or by clicking refresh
   readDirectory()
     .then(res => res.json())
@@ -137,12 +164,15 @@ async function handleFileSelectorSelect(filename: string) {
   fileSelectorSelectedFile.value = filename
   await sendMessage('sync-previous-filename', { filename }, { context: 'background', tabId })
   await sendMessage('sync-previous-line-number', { lineNumber: NULL_LINENUMBER }, { context: 'background', tabId })
-  await updateExistingNoteLines(filename)
+  await loadExistingNoteLines(filename)
 }
 
 async function handleTextboxMove() {
-  const newHeader = getExistingNoteLine(textboxLineNumber.value)
+  let newHeader = getExistingNoteLine(textboxLineNumber.value)
   // Match textbox bullet point.
+  while (newHeader.startsWith('\t')) {
+    newHeader = newHeader.slice(1)
+  }
   if (newHeader.startsWith('- ') && !textboxContent.value.startsWith('- ')) {
     textboxContent.value = `- ${textboxContent.value}`
   }
@@ -173,7 +203,7 @@ function convertNoteLineToTabCount(noteLine: string, useUserAdjustments: boolean
   return Math.max(0, tabs.length - 1 + (useUserAdjustments ? indentBalance.value : 0))
 }
 
-loadFileSelector()
+loadFileSelectorOptions()
 updateHighlight()
 </script>
 
