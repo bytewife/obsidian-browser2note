@@ -1,58 +1,91 @@
 <script setup lang="ts">
 import { onMessage, sendMessage } from 'webext-bridge'
 import VueMultiselect from 'vue-multiselect'
+import { browserAction, commands } from 'webextension-polyfill'
 import { allFilenamesCached, apiKey, selectedFileCached, selectedLineNumberCached } from '~/logic/storage'
 import { obsidianRequest, readDirectory, readFromFile, writeFile } from '~/utils'
 import { NULL_FILENAME, NULL_LINENUMBER } from '~/constants'
-import TextAreaResize from '~/components/TextAreaResize.vue'
 
 const NULL_URL = ''
+const TOPMOST_LINE_CONTENT = ' '
 
-// State
+// State variables.
 const isFileRead = ref(false)
 const existingNoteLines = ref<string[]>([])
 const textboxContent = ref('')
 const textboxLineNumber = ref<number>(selectedLineNumberCached.value)
-console.log(selectedLineNumberCached.value)
 const fileSelectorSelectedFile = ref(selectedFileCached.value)
 if (selectedFileCached.value !== NULL_FILENAME) {
-  console.log(selectedFileCached.value, NULL_FILENAME)
   updateExistingNoteLines(selectedFileCached.value)
 }
-// const fileSelectorOptions = ref(allFilenamesCached.value)
 const textHighlightUrl = ref(NULL_URL)
 const fileSelectorOptions = ref(allFilenamesCached.value)
+const indentBalance = ref(0)
 
-// Custom directives
+// Custom directives.
 const vFocus = {
   mounted: (el) => {
     el.focus()
+    // Adjusts textbox size after loading.
+    adjustTextboxSize()
   },
 }
+
+// Hotkey-handling.
+commands.onCommand.addListener(async (command) => {
+  switch (command) {
+    case 'Indent New Text': {
+      indentBalance.value = indentBalance.value + 1
+      break
+    }
+    case 'Unindent New Text': {
+      const currentExistingNoteLineTabCount = convertNoteLineToTabCount(getExistingNoteLine(textboxLineNumber.value), false)
+      let newIndentBalance = indentBalance.value - 1
+      // Don't allow the user to unindent past the existing note line.
+      if (indentBalance.value < currentExistingNoteLineTabCount) {
+        newIndentBalance = currentExistingNoteLineTabCount
+      }
+      indentBalance.value = newIndentBalance
+      break
+    }
+  }
+})
 
 function openOptionsPage() {
   browser.runtime.openOptionsPage()
 }
 
-async function readFromFileTest() {
-  readFromFile('Web-capture.md').then(res => res.text()).then(res => console.log(res))
+function getExistingNoteLine(lineNumber: number) {
+  return lineNumber !== NULL_LINENUMBER
+    ? existingNoteLines.value[lineNumber]
+    : ' '
 }
 
 async function writeToFile() {
-  if (textHighlightUrl === NULL_URL) {
+  // Guards.
+  if (textHighlightUrl.value === NULL_URL) {
     console.error('Error: Could not get highlight URL.')
-    updateHighlight()
+    window.alert('Error: Could not get highlight URL.')
+    await updateHighlight()
     return
   }
-  console.log(fileSelectorSelectedFile.value)
+  if (fileSelectorSelectedFile.value === NULL_FILENAME) {
+    console.error('Error: Could not get selected file.')
+    window.alert('Error: Could not get selected file.')
+    return
+  }
+
+  // Transform text.
   const newNoteLines = existingNoteLines.value.slice()
-  const tabsInHeader = textboxLineNumber.value !== -1 ? newNoteLines[textboxLineNumber.value].split('\t').length - 1 : 0
+  const tabsInHeader = convertNoteLineToTabCount(getExistingNoteLine(textboxLineNumber.value), true)
   const tabsToAdd = '\t'.repeat(tabsInHeader)
   const textboxContentWithHeaderIndentation = `${tabsToAdd}${textboxContent.value}`
   const addedLine = `${textboxContentWithHeaderIndentation} ${getMarkdownLink(textHighlightUrl.value)}`
   newNoteLines.splice(textboxLineNumber.value + 1, 0, addedLine)
-  // writeFile("Web-capture.md", "test text 2")
-  await writeFile('Web-capture.md', newNoteLines.join('\n'))
+
+  await writeFile(fileSelectorSelectedFile.value, newNoteLines.join('\n'))
+
+  // Keep settings.
   await updateTextboxLineNumberCached(true)
 }
 
@@ -101,13 +134,13 @@ async function handleFileSelectorSelect(filename: string) {
   console.log('updated filename is ', filename)
   const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
   // Sync with background script.
+  fileSelectorSelectedFile.value = filename
   await sendMessage('sync-previous-filename', { filename }, { context: 'background', tabId })
   await sendMessage('sync-previous-line-number', { lineNumber: NULL_LINENUMBER }, { context: 'background', tabId })
   await updateExistingNoteLines(filename)
 }
 
 async function handleTextboxMove() {
-  console.log('textbox moved')
   await updateTextboxLineNumberCached(false)
 }
 
@@ -126,12 +159,18 @@ function adjustTextboxSize() {
   element!.style.height = `${element.scrollHeight}px`
 }
 
+// Turn a string of text into a `\t` count with adjustments by user.
+function convertNoteLineToTabCount(noteLine: string, useUserAdjustments: boolean) {
+  const tabs = noteLine.split('\t')
+  return Math.max(0, tabs.length - 1 + (useUserAdjustments ? indentBalance.value : 0))
+}
+
 loadFileSelector()
 updateHighlight()
 </script>
 
 <template>
-  <main class="w-[800px] px-4 py-5 text-center text-gray-700">
+  <main class="w-[800px] px-4 py-5 text-center text-gray-1400 border-solid border-4 border-gray-100">
     <Logo />
 
     <VueMultiselect
@@ -159,8 +198,8 @@ updateHighlight()
     <div v-if="isFileRead" class="note">
       <!-- Starter line -->
       <div class="noteLine" @click="moveTextbox(NULL_LINENUMBER)">
-        <div>---</div>
-        <pre style="display:flex;"><portal-target :name="NULL_LINENUMBER.toString()" @change="handleTextboxMove" /></pre>
+        <pre>{{ TOPMOST_LINE_CONTENT }}</pre>
+        <pre style="display:flex;"><template v-if="textboxLineNumber === NULL_LINENUMBER"><span v-for="tabIndex in convertNoteLineToTabCount(TOPMOST_LINE_CONTENT, true)" :key="tabIndex">&#9;</span></template><portal-target :name="NULL_LINENUMBER.toString()" @change="handleTextboxMove" /></pre>
       </div>
 
       <!-- Existing note lines -->
@@ -169,27 +208,35 @@ updateHighlight()
 
         <!-- Textbox portal -->
         <div v-if="textboxLineNumber === index">
-          <pre style="display:flex;"><span v-for="(_, tabIndex) in noteLine.split('\t').slice(0, -1)" :key="tabIndex">&#9;</span><portal-target :name="index.toString()" @change="handleTextboxMove" /></pre>
+          <pre style="display:flex;"><span v-for="tabIndex in convertNoteLineToTabCount(noteLine, true)" :key="tabIndex">&#9;</span><portal-target :name="index.toString()" @change="handleTextboxMove" /></pre>
         </div>
       </div>
     </div>
 
-    <button class="btn mt-2" @click="readFromFileTest">
-      Read from file
-    </button>
-    <button class="btn mt-2" @click="writeToFile">
-      Write to file
-    </button>
-    <button class="btn mt-2" @click="openOptionsPage">
-      Open Options
-    </button>
-    <div class="mt-2">
-      <span class="opacity-50">Storage:</span> {{ apiKey }}
+    <div class="footer">
+      <button class="btn mt-2" @click="adjustTextboxSize">
+        Read from file
+      </button>
+      <button class="btn mt-2" @click="writeToFile">
+        Write to file
+      </button>
+      <button class="btn mt-2" @click="openOptionsPage">
+        Open Options
+      </button>
     </div>
   </main>
 </template>
 
 <style>
+main {
+  height: 600px; /* Note: The max height of extensions. */
+}
+.footer {
+  left: 200px; /* Note: Half the max width of extensions */
+  display: flex;
+  position: fixed;
+  bottom: 0px;
+}
 .note {
   display: flex;
   flex-direction: column;
@@ -202,6 +249,10 @@ updateHighlight()
   background: white;
   width: 100%;
 }
+.noteLine pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
 .noteLine:hover {
   background: lightgrey;
 }
@@ -212,7 +263,6 @@ updateHighlight()
   resize: none;
   background: bisque;
   border-radius: 2px;
-  border-style: double;
   margin-bottom: 3px;
 }
 </style>

@@ -18,19 +18,17 @@ browser.runtime.onInstalled.addListener((): void => {
 
 // Handle shortcuts.
 commands.onCommand.addListener(async (command) => {
-  // console.log(browser.tabs.executeScript(tabId, {file: '../../dist/contentScripts/index.global.js'}).then(
-  //   (res) => {
-  //     console.log(res)
-  //   }
-  // ))
-  // eslint-disable-next-line no-console
   console.log('Command:', command)
-  if (command === 'Open Note Prompt') {
-    browserAction.openPopup()
-  }
-  else if (command === 'Test Highlight') {
-    const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
-    sendMessage('highlight-input', { tabId }, { context: 'content-script', tabId })
+  switch(command) {
+    case 'Open Note Prompt': {
+      browserAction.openPopup()
+      break
+    }
+    case 'Test Highlight': {
+      const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
+      sendMessage('highlight-input', { tabId }, { context: 'content-script', tabId })
+      break
+    }
   }
 })
 

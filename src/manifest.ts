@@ -57,6 +57,16 @@ export async function getManifest() {
           default: 'Ctrl+E',
         },
       },
+      'Indent New Text': {
+        suggested_key: {
+          default: 'Ctrl+Alt+O',
+        },
+      },
+      'Unindent New Text': {
+        suggested_key: {
+          default: 'Ctrl+Alt+I',
+        },
+      },
     },
   }
 
