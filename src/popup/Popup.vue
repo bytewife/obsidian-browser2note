@@ -3,7 +3,7 @@ import { onMessage, sendMessage } from 'webext-bridge'
 import VueMultiselect from 'vue-multiselect'
 import { browserAction, commands } from 'webextension-polyfill'
 import { grammar, hideLinkSemantics } from '../../parser/parser'
-import { allFilenamesCached, apiKey, selectedFileCached, selectedLineNumberCached } from '~/logic/storage'
+import { allFilenamesCached, selectedFileCached, selectedLineNumberCached } from '~/logic/storage'
 import { obsidianRequest, readDirectory, readFromFile, writeFile } from '~/utils'
 import { NULL_FILENAME, NULL_LINENUMBER } from '~/constants'
 
@@ -221,8 +221,8 @@ async function loadExistingNoteLines(filename: string) {
 async function loadFileSelectorOptions() {
   // TODO cache this by doing every time the plugin loads, or by clicking refresh
   readDirectory()
-    .then(res => {
-      if (res.status !== 200) {
+    .then((res, err) => {
+      if (err || res.status !== 200) {
         console.error('Error: Could not read directory.')
         window.alert('Error: Could not read directory.')
         return

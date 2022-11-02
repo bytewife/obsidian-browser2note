@@ -1,4 +1,4 @@
-import { apiKey } from '~/logic'
+import { apiKey, isSecureMode } from '~/logic'
 
 // This file contains various web utils, which interact with the Obsidian local REST API plugin.
 
@@ -20,11 +20,13 @@ export async function obsidianRequest(
   }
 
   return fetch(
-        `http${insecureMode ? '' : 's'}://127.0.0.1:${
-            insecureMode ? '27123' : '27124'
-        }${path}`,
-        requestOptions,
-  )
+      `http${insecureMode ? '' : 's'}://127.0.0.1:${
+          insecureMode ? '27123' : '27124'
+      }${path}`,
+      requestOptions,
+  ).then((response) => {
+    return response
+  })
 }
 
 export async function readDirectory() {
@@ -37,13 +39,8 @@ export async function readFromFile(filename: string) {
     apiKey.value,
     `/vault/${filename}`,
     { method: 'get' },
-    true,
+    !isSecureMode.value,
   )
-    .then((res, err) => {
-      if (err)
-        console.error(`Error opening file: ${filename}. Check if it was removed.`, err)
-      return res
-    })
 }
 
 export async function writeFile(filename: string, text: string) {
@@ -51,7 +48,7 @@ export async function writeFile(filename: string, text: string) {
     apiKey.value,
       `/vault/${filename}`,
       { method: 'put', body: text },
-      true,
+      !isSecureMode.value,
   )
     .then((res, err) => {
       if (err)

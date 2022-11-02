@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { apiKey } from '~/logic/storage'
+import { apiKey, isSecureMode } from '~/logic/storage'
 </script>
 <template>
   <main class="px-4 py-10 text-center text-gray-700 dark:text-gray-200">
@@ -9,7 +9,10 @@ import { apiKey } from '~/logic/storage'
       This is the options page
     </p>
 
-    API Key <input v-model="apiKey" class="border border-gray-400 rounded px-2 py-1 mt-2">
+    <div>
+      <div>Secure Mode <input v-model="isSecureMode" type="checkbox"></div>
+      <div>API Key <input v-model="apiKey" class="border border-gray-400 rounded px-2 py-1 mt-2"></div>
+    </div>
 
     <div class="mt-4">
       Powered by Vite <pixelarticons-zap class="align-middle inline-block" />
