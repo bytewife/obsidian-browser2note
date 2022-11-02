@@ -223,8 +223,9 @@ async function loadFileSelectorOptions() {
   readDirectory()
     .then((res, err) => {
       if (err || res.status !== 200) {
-        console.error('Error: Could not read directory.')
-        window.alert('Error: Could not read directory.')
+        const msg = 'Error: Could not read directory. Try refreshing and/or updating the certificate if secure mode is used.'
+        console.error(msg)
+        window.alert(msg)
         return
       }
       return res.json()

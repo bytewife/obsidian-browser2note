@@ -24,7 +24,7 @@ It is intended for an outline-heavy workflow.
 
 ## Getting started
 - Install this browser extension & the prerequisites
-- (This will be fixed later) in your [obsidian-local-rest-api](https://github.com/coddingtonbear/obsidian-local-rest-api) settings you must use 'Enable Insecure HTTP Server'
+- In your [obsidian-local-rest-api](https://github.com/coddingtonbear/obsidian-local-rest-api) settings you must use 'Enable Insecure HTTP Server'
 - Paste [obsidian-local-rest-api](https://github.com/coddingtonbear/obsidian-local-rest-api) 's key the Browser2Note settings
 
 ## Usage
