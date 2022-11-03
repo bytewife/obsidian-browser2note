@@ -17,11 +17,6 @@ const isFileRead = ref(false)
 const existingNoteLines = ref<string[]>([])
 // Stores the text content of the textbox.
 const textboxContent = ref('')
-// Indicates the line number of the note's existing lines that the textbox is placed under.
-const textboxLineNumber = ref<number>(selectedLineNumberCached.value)
-const fileSelectorSelectedFile = ref(selectedFileCached.value)
-if (selectedFileCached.value !== NULL_FILENAME)
-  loadExistingNoteLines(selectedFileCached.value)
 // Stores the text that the user highlighted in the browser.
 const textHighlightUrl = ref(NULL_URL)
 // Stores all the filenames in the Obsidian vault.
@@ -32,6 +27,23 @@ const indentBalance = ref(0)
 const textbox = ref(null)
 // Indicates if the popup is closing, in order to provide visual feedback to user of a successful submission.
 const isClosing = ref(false)
+
+// Indicates the line number of the note's existing lines that the textbox is placed under.
+const textboxLineNumber = ref<number>(NULL_LINENUMBER)
+browser.storage.local.get('selectedLineNumber')
+    .then((result) => {
+      textboxLineNumber.value = result.selectedLineNumber
+      console.error('sln',result.selectedLineNumber)
+    })
+
+const fileSelectorSelectedFile = ref(NULL_FILENAME)
+browser.storage.local.get('selectedFile')
+    .then((result) => {
+      fileSelectorSelectedFile.value = result.selectedFile
+      if (result.selectedFile !== NULL_FILENAME)
+        loadExistingNoteLines(fileSelectorSelectedFile.value)
+    })
+
 
 // Custom directives.
 const vFocus = {

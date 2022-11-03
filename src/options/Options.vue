@@ -2,7 +2,10 @@
 import { apiKey, isSecureMode } from '~/logic/storage'
 
 const apiKeyTemp = ref(apiKey.value)
+browser.storage.local.get('apiKey').then((res) => apiKeyTemp.value = res.apiKey)
+
 const isSecureModeTemp = ref(isSecureMode.value)
+browser.storage.local.get('isSecureMode').then((res) => isSecureMode.value = res.isSecureMode)
 
 async function syncApiKey() {
   browser.storage.local.set({ apiKey: apiKeyTemp.value })
