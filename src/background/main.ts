@@ -40,8 +40,8 @@ onMessage('sync-previous-line-number', async ({ data }) => {
 // Finalize variables into cache after popup closes.
 browser.runtime.onConnect.addListener((externalPort) => {
   externalPort.onDisconnect.addListener(() => {
-    selectedFileCached.value = selectedFileTemp
-    selectedLineNumberCached.value = selectedLineNumberTemp
+    browser.storage.local.set({ selectedFile: selectedFileTemp })
+    browser.storage.local.set({ selectedLineNumber: selectedLineNumberTemp })
   })
 })
 
