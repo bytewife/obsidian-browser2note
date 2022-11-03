@@ -144,11 +144,16 @@ async function updateHighlight() {
       window.close()
     }
     textHighlightUrl.value = data.url!
-    textboxContent.value = data.text
-    updateTextboxContentBullet(data.text)
+    const newHighlight = cleanupHighlight(data.text)
+    textboxContent.value = newHighlight
+    updateTextboxContentBullet(newHighlight)
   })
   const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
   sendMessage('highlight-input', { tabId }, { context: 'content-script', tabId })
+}
+
+function cleanupHighlight(highlight: string) {
+  return highlight.trim()
 }
 
 // Performs functions appropriate to when a new file is selected.
