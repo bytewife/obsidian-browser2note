@@ -1,5 +1,16 @@
 <script setup lang="ts">
 import { apiKey, isSecureMode } from '~/logic/storage'
+
+const apiKeyTemp = ref(apiKey.value)
+const isSecureModeTemp = ref(isSecureMode.value)
+
+async function syncApiKey() {
+  browser.storage.local.set({ apiKey: apiKeyTemp.value })
+}
+
+async function syncIsSecureMode(event) {
+  browser.storage.local.set({ isSecureMode: event.target.checked })
+}
 </script>
 <template>
   <main class="px-4 py-10 text-center text-gray-700 dark:text-gray-200">
@@ -10,8 +21,8 @@ import { apiKey, isSecureMode } from '~/logic/storage'
     </p>
 
     <div>
-      <div>Secure Mode <input v-model="isSecureMode" type="checkbox"></div>
-      <div>API Key <input v-model="apiKey" class="border border-gray-400 rounded px-2 py-1 mt-2"></div>
+      <div>Secure Mode <input v-model="isSecureModeTemp" type="checkbox" @input="syncIsSecureMode($event)"></div>
+      <div>API Key <input v-model="apiKeyTemp" class="border border-gray-400 rounded px-2 py-1 mt-2" @input="syncApiKey"></div>
     </div>
 
     <div class="mt-4">

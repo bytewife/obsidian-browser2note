@@ -36,7 +36,7 @@ export async function readDirectory() {
 export async function readFromFile(filename: string) {
   // TODO: Get secure mode working.
   return obsidianRequest(
-    apiKey.value,
+    await browser.storage.local.get('apiKey').then((result) => result.apiKey),
     `/vault/${filename}`,
     { method: 'get' },
     !isSecureMode.value,
@@ -45,7 +45,7 @@ export async function readFromFile(filename: string) {
 
 export async function writeFile(filename: string, text: string) {
   return obsidianRequest(
-    apiKey.value,
+      await browser.storage.local.get('apiKey').then((result) => result.apiKey),
       `/vault/${filename}`,
       { method: 'put', body: text },
       !isSecureMode.value,
