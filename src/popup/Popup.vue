@@ -31,18 +31,17 @@ const isClosing = ref(false)
 // Indicates the line number of the note's existing lines that the textbox is placed under.
 const textboxLineNumber = ref<number>(NULL_LINENUMBER)
 browser.storage.local.get('selectedLineNumber')
-    .then((result) => {
-      textboxLineNumber.value = result.selectedLineNumber
-    })
+  .then((result) => {
+    textboxLineNumber.value = result.selectedLineNumber
+  })
 
 const fileSelectorSelectedFile = ref(NULL_FILENAME)
 browser.storage.local.get('selectedFile')
-    .then((result) => {
-      fileSelectorSelectedFile.value = result.selectedFile
-      if (result.selectedFile !== NULL_FILENAME)
-        loadExistingNoteLines(fileSelectorSelectedFile.value)
-    })
-
+  .then((result) => {
+    fileSelectorSelectedFile.value = result.selectedFile
+    if (result.selectedFile !== NULL_FILENAME)
+      loadExistingNoteLines(fileSelectorSelectedFile.value)
+  })
 
 // Custom directives.
 const vFocus = {
@@ -141,8 +140,9 @@ function getMarkdownLink(url: string) {
 
 // Updates the line number of the textbox, s.t. it may move via Vue or some other reactive framework.
 function moveTextbox(index: number) {
+  if (index !== textboxLineNumber.value)
+    updateTextboxContentBullet()
   textboxLineNumber.value = index
-  updateTextboxContentBullet()
 }
 
 // Get browser's highlighted text information.
