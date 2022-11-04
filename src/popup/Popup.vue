@@ -33,7 +33,6 @@ const textboxLineNumber = ref<number>(NULL_LINENUMBER)
 browser.storage.local.get('selectedLineNumber')
     .then((result) => {
       textboxLineNumber.value = result.selectedLineNumber
-      console.error('sln',result.selectedLineNumber)
     })
 
 const fileSelectorSelectedFile = ref(NULL_FILENAME)
