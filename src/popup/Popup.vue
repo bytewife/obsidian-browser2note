@@ -141,7 +141,7 @@ function getMarkdownLink(url: string) {
 // Updates the line number of the textbox, s.t. it may move via Vue or some other reactive framework.
 function moveTextbox(index: number) {
   if (index !== textboxLineNumber.value)
-    updateTextboxContentBullet()
+    updateTextboxContentBullet(index)
   textboxLineNumber.value = index
 }
 
@@ -157,7 +157,7 @@ async function updateHighlight() {
     textHighlightUrl.value = data.url!
     const newHighlight = cleanupHighlight(data.text)
     textboxContent.value = newHighlight
-    updateTextboxContentBullet(newHighlight)
+    updateTextboxContentBullet(textboxLineNumber.value, newHighlight)
   })
   const tabId = (await browser.tabs.query({ active: true, currentWindow: true }))[0].id!
   sendMessage('highlight-input', { tabId }, { context: 'content-script', tabId })
@@ -190,18 +190,18 @@ async function updateTextboxLineNumberCached(isWriting: boolean) {
   await sendMessage('sync-previous-line-number', { lineNumber }, { context: 'background', tabId })
 }
 
-function updateTextboxContentBullet(text?: string) {
-  if (!text)
-    text = textboxContent.value
-  const index = textboxLineNumber.value
-  let newHeader = getExistingNoteLineByNumber(index)
+function updateTextboxContentBullet(newHeaderLineNumber: number, boxContent?: string) {
+  if (!boxContent)
+    boxContent = textboxContent.value
+  let newHeader = getExistingNoteLineByNumber(newHeaderLineNumber)
   // Match textbox bullet point.
   while (newHeader.startsWith('\t'))
     newHeader = newHeader.slice(1)
-  if (newHeader.startsWith('- ') && !textboxContent.value.startsWith('- '))
-    textboxContent.value = `- ${textboxContent.value}`
-  else if (!newHeader.startsWith('- ') && textboxContent.value.startsWith('- '))
-    textboxContent.value = textboxContent.value.slice(2)
+  if (newHeader.startsWith('- ') && !boxContent.startsWith('- '))
+    boxContent = `- ${boxContent}`
+  else if (!newHeader.startsWith('- ') && boxContent.startsWith('- '))
+    boxContent = boxContent.slice(2)
+  textboxContent.value = boxContent
 }
 
 // This function updates the textbox's height to fit its text content fully.
